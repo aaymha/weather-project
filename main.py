@@ -1,7 +1,6 @@
 import streamlit as st
 import pandas as pd
 import requests
-import plotly as pt
 import datetime
 
 def side_bar():
@@ -24,11 +23,17 @@ def display(weather_data):
 
 def next_days(weather_week):
     first_time = datetime.datetime(1970, 1, 1)
+    time_list = []
+    temp_list = []
     for values in weather_week['list']:
-        time = values['dt']
-        st.write(first_time + datetime.timedelta(seconds=time))
+        seconds = values['dt']
+        converted = datetime.timedelta(seconds=seconds)
+        time = first_time + converted
+        time_list.append(time)
+        temp_list.append(values['main']['temp'])
 
-    st.write(weather_week)
+    df = pd.DataFrame({'date': time_list, 'temp': temp_list})
+    st.bar_chart(data=df, x='date', y='temp')
 
 def main():
     st.set_page_config(page_title="MyWeather")
