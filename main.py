@@ -11,29 +11,36 @@ def display(weather_data):
     temp, feel = st.columns(2)
     wind, desc = st.columns(2)
     country, name = st.columns(2)
+    try:
+        temp.metric("Temperature", weather_data['main']['temp'], border=True)
+        feel.metric("Feels like", weather_data['main']['feels_like'], border=True)
 
-    temp.metric("Temperature", weather_data['main']['temp'], border=True)
-    feel.metric("Feels like", weather_data['main']['feels_like'], border=True)
+        wind.metric("Wind", weather_data['wind']['speed'] ,border=True)
+        desc.metric("Description", weather_data['weather'][0]['description'] ,border=True)
 
-    wind.metric("Wind", weather_data['wind']['speed'] ,border=True)
-    desc.metric("Description", weather_data['weather'][0]['description'], border=True)
+        country.metric("Country", weather_data['sys']['country'], border=True)
+        name.metric("Name", weather_data['name'], border=True)
+    except KeyError:
+        st.write("Enter correct city name!")
 
-    country.metric("Country", weather_data['sys']['country'], border=True)
-    name.metric("Name", weather_data['name'], border=True)
 
 def next_days(weather_week):
     first_time = datetime.datetime(1970, 1, 1)
     time_list = []
     temp_list = []
-    for values in weather_week['list']:
-        seconds = values['dt']
-        converted = datetime.timedelta(seconds=seconds)
-        time = first_time + converted
-        time_list.append(time)
-        temp_list.append(values['main']['temp'])
+    color_list = ["#88c7dc", "#FFB343", "#FF0000"]
+    try:
+        for values in weather_week['list']:
+            seconds = values['dt']
+            converted = datetime.timedelta(seconds=seconds)
+            time = first_time + converted
+            time_list.append(time.strftime("%Y-%m-%d %H:%M"))
+            temp_list.append(values['main']['temp'])
 
-    df = pd.DataFrame({'date': time_list, 'temp': temp_list})
-    st.bar_chart(data=df, x='date', y='temp')
+        df = pd.DataFrame({'date': time_list, 'temp': temp_list})
+        st.bar_chart(data=df, x='date', y='temp')
+    except KeyError:
+        st.write("Enter correct city name!")
 
 def main():
     st.set_page_config(page_title="MyWeather")
