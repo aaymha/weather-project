@@ -2,14 +2,45 @@ import streamlit as st
 import pandas as pd
 import requests
 import plotly as pt
-import json
+import datetime
 
-st.set_page_config(page_title="MyWeather")
-api_key = "79d4c5cc409902a82858318bc7da2fd9"
-city = st.text_input("Enter city or country name: ")
+def side_bar():
+    city = st.sidebar.text_input("Enter your city or country name:")
+    return city
 
-url = f"https://api.openweathermap.org/data/2.5/weather?q={city}&appid={api_key}&units=metric"
-response = requests.get(url)
-weather_data = response.json()
+def display(weather_data):
+    temp, feel = st.columns(2)
+    wind, desc = st.columns(2)
+    country, name = st.columns(2)
 
-st.write(weather_data['name'] ,weather_data['main']['temp'])
+    temp.metric("Temperature", weather_data['main']['temp'], border=True)
+    feel.metric("Feels like", weather_data['main']['feels_like'], border=True)
+
+    wind.metric("Wind", weather_data['wind']['speed'] ,border=True)
+    desc.metric("Description", weather_data['weather'][0]['description'], border=True)
+
+    country.metric("Country", weather_data['sys']['country'], border=True)
+    name.metric("Name", weather_data['name'], border=True)
+
+def next_days(weather_week):
+    first_time = datetime.datetime(1970, 1, 1)
+    for values in weather_week['list']:
+        time = values['dt']
+        st.write(first_time + datetime.timedelta(seconds=time))
+
+    st.write(weather_week)
+
+def main():
+    st.set_page_config(page_title="MyWeather")
+    api_key = "79d4c5cc409902a82858318bc7da2fd9"
+    city = side_bar()
+    url_day = f"https://api.openweathermap.org/data/2.5/weather?q={city}&appid={api_key}&units=metric"
+    url_week = f"https://api.openweathermap.org/data/2.5/forecast?q={city}&appid={api_key}&units=metric"
+    response = requests.get(url_day)
+    week_response = requests.get(url_week)
+    weather_data = response.json()
+    weather_week = week_response.json()
+    display(weather_data)
+    next_days(weather_week)
+
+main()
