@@ -44,7 +44,7 @@ def next_days(weather_week):
 
 def main():
     st.set_page_config(page_title="MyWeather")
-    api_key = "79d4c5cc409902a82858318bc7da2fd9"
+    api_key = "**"
     city = side_bar()
     url_day = f"https://api.openweathermap.org/data/2.5/weather?q={city}&appid={api_key}&units=metric"
     url_week = f"https://api.openweathermap.org/data/2.5/forecast?q={city}&appid={api_key}&units=metric"
